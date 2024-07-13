@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "mobile-native",
-    "slug": "mobile-native",
+    "name": "Aora",
+    "slug": "aora",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "myapp",
+    "scheme": "aora",
     "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./assets/images/splash.png",
@@ -18,7 +18,8 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#ffffff",
+        "package": "com.jsm.aora"
       }
     },
     "web": {
