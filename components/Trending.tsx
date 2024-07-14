@@ -53,15 +53,6 @@ type TrendingItemTypes = {
   item: IPost;
 };
 
-const zoomIn = {
-  0: {
-    scale: 1,
-  },
-  1: {
-    scale: 0.9,
-  },
-};
-
 const TrendingItem = ({ activeItem, item }: TrendingItemTypes) => {
   const scaleAnim = useRef(new Animated.Value(1)).current;
   const [play, setPlay] = useState(false);
@@ -74,7 +65,6 @@ const TrendingItem = ({ activeItem, item }: TrendingItemTypes) => {
     }).start();
   }, [activeItem]);
 
-  console.log(item?.video, '<- ')
   return (
     <Animated.View
       style={{ transform: [{ scale: scaleAnim }] }}

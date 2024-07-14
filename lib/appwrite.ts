@@ -1,4 +1,13 @@
-import { Client, Account, ID, Avatars, Databases, Query } from "react-native-appwrite";
+import {
+  Client,
+  Account,
+  ID,
+  Avatars,
+  Databases,
+  Query,
+  Storage,
+  ImageGravity,
+} from "react-native-appwrite";
 
 interface ICreateUser {
   (email: string, password: string, username: string): any;
@@ -9,17 +18,17 @@ interface ISignIn {
 }
 
 interface ICurrentUser {
-  $collectionId: string,
-  $createdAt: string,
-  $databaseId: string,
-  $id: string,
-  $permissions: string[],
-  $tenant: string,
-  $updatedAt: string,
-  accountId: string,
-  avatar: string,
-  email: string,
-  username: string
+  $collectionId: string;
+  $createdAt: string;
+  $databaseId: string;
+  $id: string;
+  $permissions: string[];
+  $tenant: string;
+  $updatedAt: string;
+  accountId: string;
+  avatar: string;
+  email: string;
+  username: string;
 }
 
 interface ICreator {
@@ -51,6 +60,20 @@ interface IPost {
   video: string;
 }
 
+interface IDocumentPickerAssets {
+  mimeType: string;
+  name: string;
+  size: number;
+  uri: string;
+}
+interface ICreateVideoForm {
+  title: string;
+  video: IDocumentPickerAssets | null;
+  thumbnail: IDocumentPickerAssets | null;
+  prompt: string;
+  userId: string;
+}
+
 export const appwriteconfig = {
   endpoint: "https://cloud.appwrite.io/v1",
   platform: "com.jsm.aora",
@@ -72,6 +95,7 @@ client
 const account = new Account(client);
 const avatars = new Avatars(client);
 const databases = new Databases(client);
+const storage = new Storage(client);
 
 export const createUser: ICreateUser = async (email, password, username) => {
   try {
@@ -88,15 +112,15 @@ export const createUser: ICreateUser = async (email, password, username) => {
     await signIn(email, password);
 
     const newUser = await databases.createDocument(
-        appwriteconfig.databaseId,
-        appwriteconfig.userCollectionId,
-        ID.unique(),
-        {
-            accountId: newAccount.$id,
-            email,
-            username,
-            avatar: avatarUrl
-        }
+      appwriteconfig.databaseId,
+      appwriteconfig.userCollectionId,
+      ID.unique(),
+      {
+        accountId: newAccount.$id,
+        email,
+        username,
+        avatar: avatarUrl,
+      }
     );
 
     return newUser;
@@ -108,8 +132,8 @@ export const createUser: ICreateUser = async (email, password, username) => {
 
 export const signIn: ISignIn = async (email, password) => {
   try {
-    const session = await account.createEmailPasswordSession(email, password)
-    console.log('SESSION => ', session)
+    const session = await account.createEmailPasswordSession(email, password);
+    console.log("SESSION => ", session);
     return session;
   } catch (error: any) {
     console.log("error sign in => ", error);
@@ -118,74 +142,162 @@ export const signIn: ISignIn = async (email, password) => {
 };
 
 export const signOut = async () => {
-    try {
-        const deleteSession = await account.deleteSession('current')
-    } catch (error) {
-        console.log('error sign out', error)
-    }
-}
+  try {
+    await account.deleteSession("current");
+  } catch (error) {
+    console.log("error sign out", error);
+  }
+};
 
 export const getCurrentUser = async (): Promise<ICurrentUser> => {
   try {
     const currentAccount = await account.get();
 
     if (!currentAccount) throw Error("No current account");
-    console.log(currentAccount, '<0 curr account')
     const currentUser = await databases.listDocuments(
       appwriteconfig.databaseId,
       appwriteconfig.userCollectionId,
-      [Query.equal('accountId', currentAccount.$id)]
-    )
+      [Query.equal("accountId", currentAccount.$id)]
+    );
 
     if (!currentUser) throw Error("No User Found");
-    // console.log(currentUser.documents[0], "<- curr user")
     return currentUser.documents[0] as ICurrentUser;
   } catch (error) {
-    console.log('error get current user => ', error)
-    throw new Error;
+    console.log("error get current user => ", error);
+    throw new Error();
   }
-}
+};
 
 export const getAllPosts = async (): Promise<IPost[]> => {
   try {
     const post = await databases.listDocuments(
       appwriteconfig.databaseId,
       appwriteconfig.videoCollectionId
-    )
+    );
 
     return post.documents as IPost[];
   } catch (error) {
-    console.log('error get all posts => ', error)
-    throw new Error
+    console.log("error get all posts => ", error);
+    throw new Error();
   }
-}
+};
 
 export const getLatestPosts = async (): Promise<IPost[]> => {
   try {
     const post = await databases.listDocuments(
       appwriteconfig.databaseId,
       appwriteconfig.videoCollectionId,
-      [Query.orderDesc('$createdAt'), Query.limit(7)]
-    )
+      [Query.orderDesc("$createdAt"), Query.limit(7)]
+    );
 
     return post.documents as IPost[];
   } catch (error) {
-    console.log('error get all posts => ', error)
-    throw new Error
+    console.log("error latest posts => ", error);
+    throw new Error();
   }
-}
+};
 
 export const searchPosts = async (query: string): Promise<IPost[]> => {
   try {
     const post = await databases.listDocuments(
       appwriteconfig.databaseId,
       appwriteconfig.videoCollectionId,
-      [Query.search('title', query)]
-    )
+      [Query.search("title", query)]
+    );
 
     return post.documents as IPost[];
   } catch (error) {
-    console.log('error search posts => ', error)
-    throw new Error
+    console.log("error search posts => ", error);
+    throw new Error();
   }
-}
+};
+
+export const getUserPosts = async (userId: string): Promise<IPost[]> => {
+  try {
+    const post = await databases.listDocuments(
+      appwriteconfig.databaseId,
+      appwriteconfig.videoCollectionId,
+      [Query.equal("creator", userId), Query.orderDesc('$createdAt')]
+    );
+
+    return post.documents as IPost[];
+  } catch (error) {
+    console.log("error getUserPosts => ", error);
+    throw new Error();
+  }
+};
+
+const getFilePreview = async (fileId: string, type: string) => {
+  let fileUrl;
+
+  try {
+    if (type === "video") {
+      fileUrl = storage.getFileView(appwriteconfig.storageId, fileId);
+    } else if (type === "image") {
+      fileUrl = storage.getFilePreview(
+        appwriteconfig.storageId,
+        fileId,
+        2000,
+        2000,
+        ImageGravity.Top,
+        100
+      );
+    } else {
+      throw new Error("Invalid file type");
+    }
+
+    if (!fileUrl) throw Error;
+    return fileUrl;
+  } catch (error) {
+    console.log("error get file preview => ", error);
+    throw new Error();
+  }
+};
+
+const uploadFile = async (file: IDocumentPickerAssets | null, type: string) => {
+  if (!file) return;
+
+  const { mimeType, ...rest } = file;
+  const asset = { type: mimeType, ...rest };
+
+  try {
+    const uploadedFile = await storage.createFile(
+      appwriteconfig.storageId,
+      ID.unique(),
+      asset
+    );
+
+    const fileUrl = await getFilePreview(uploadedFile.$id, "video");
+    return fileUrl;
+  } catch (error) {
+    console.log("error upload file => ", error);
+    throw new Error();
+  }
+};
+
+export const createVideo = async (form: ICreateVideoForm) => {
+  try {
+    const [thumbnailUrl, videoUrl] = await Promise.all([
+      uploadFile(form.thumbnail, "image"),
+      uploadFile(form.video, "video"),
+    ]);
+
+    const newPost = await databases.createDocument(
+      appwriteconfig.databaseId,
+      appwriteconfig.videoCollectionId,
+      ID.unique(),
+      {
+        title: form.title,
+        thumbnail: thumbnailUrl,
+        video: videoUrl,
+        prompt: form.prompt,
+        creator: form.userId,
+      }
+    );
+
+    return newPost;
+  } catch (error) {
+    console.log("error create video => ", error);
+    throw new Error();
+  }
+};

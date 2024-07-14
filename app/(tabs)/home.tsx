@@ -15,6 +15,7 @@ import EmptyState from "@/components/EmptyState";
 import { getAllPosts, getLatestPosts } from "@/lib/appwrite";
 import useAppwrite from "@/lib/useAppwrite";
 import VideoCard from "@/components/VideoCard";
+import { StatusBar } from "expo-status-bar";
 
 interface ICreator {
   $collectionId: string;
@@ -114,6 +115,7 @@ const Home = () => {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       />
+      {/* <StatusBar backgroundColor="bg-white" /> */}
     </SafeAreaView>
   );
 };
