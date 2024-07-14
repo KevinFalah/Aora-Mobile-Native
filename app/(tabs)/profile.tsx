@@ -12,7 +12,7 @@ import React, { useEffect, useState } from "react";
 import { icons, images } from "@/constants";
 import SearchInput from "@/components/SearchInput";
 import EmptyState from "@/components/EmptyState";
-import { getUserPosts, searchPosts, signOut } from "@/lib/appwrite";
+import { getUserPosts, signOut } from "@/lib/appwrite";
 import useAppwrite from "@/lib/useAppwrite";
 import VideoCard from "@/components/VideoCard";
 import { router, useLocalSearchParams } from "expo-router";
