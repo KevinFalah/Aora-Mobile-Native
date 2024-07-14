@@ -15,7 +15,7 @@ import EmptyState from "@/components/EmptyState";
 import { getUserPosts, signOut } from "@/lib/appwrite";
 import useAppwrite from "@/lib/useAppwrite";
 import VideoCard from "@/components/VideoCard";
-import { router, useLocalSearchParams } from "expo-router";
+import { router } from "expo-router";
 import { useGlobalContext } from "@/context/GlobalProvider";
 import InfoBox from "@/components/InfoBox";
 
