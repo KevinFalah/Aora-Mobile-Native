@@ -42,6 +42,7 @@ interface IPost {
   thumbnail: string;
   title: string;
   video: string;
+  userLiked: string[]
 }
 
 type RenderHeaderTypes = {

@@ -37,7 +37,7 @@ interface IPost {
 
 type VideoCardType = {
   videoData: IPost;
-  refetch: () => void;
+  refetch?: () => void;
 };
 
 const VideoCard = ({ videoData, refetch }: VideoCardType) => {
@@ -51,10 +51,11 @@ const VideoCard = ({ videoData, refetch }: VideoCardType) => {
     creator: { avatar, username },
   } = videoData;
   const { user } = useGlobalContext();
+  const [isLoading, setIsLoading] = useState(false);
 
   const savedVideo = async () => {
     const userId = user?.$id || "";
-
+    setIsLoading(true);
     try {
       if (userId) {
         const userLikedSet = new Set(userLiked);
@@ -63,26 +64,35 @@ const VideoCard = ({ videoData, refetch }: VideoCardType) => {
 
         console.log(updatedUserLiked, "< updated liked");
         await likedVideo($id, updatedUserLiked);
-        await refetch();
+
+        if (typeof refetch === "function") {
+          await refetch();
+        }
       }
     } catch (error) {
       Alert.alert("Error", "Error Save Video");
+    } finally {
+      setIsLoading(false);
+      setIsOpenComp(false);
     }
   };
 
   const unSavedVideo = async () => {
     const userId = user?.$id || "";
-
+    setIsLoading(true);
     try {
       if (userId) {
         const updatedUserLiked = userLiked?.filter((id) => id !== user?.$id);
-
-        console.log(updatedUserLiked, "< updated UnLiked");
         await likedVideo($id, updatedUserLiked);
-        await refetch();
+        if (typeof refetch === "function") {
+          await refetch();
+        }
       }
     } catch (error) {
-      Alert.alert("Error", "Error Save Video");
+      Alert.alert("Error", "Error Unsaved Video");
+    } finally {
+      setIsLoading(false);
+      setIsOpenComp(false);
     }
   };
 
@@ -144,6 +154,7 @@ const VideoCard = ({ videoData, refetch }: VideoCardType) => {
               activeOpacity={0.6}
               onPress={isAlreadySaved().func}
               className="bg-black-100 w-36 rounded-md absolute right-1 top-12 px-3 py-2"
+              disabled={isLoading}
             >
               <Text className="text-white text-left font-pregular">
                 {isAlreadySaved().title}

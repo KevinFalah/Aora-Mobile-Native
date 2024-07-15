@@ -320,3 +320,19 @@ export const likedVideo = async (videoId: string, userLiked: string[]) => {
     throw new Error;
   }
 }
+
+export const getVideosBySaved = async (userId: string): Promise<IPost[]> => {
+  try {
+    const post = await databases.listDocuments(
+      appwriteconfig.databaseId,
+      appwriteconfig.videoCollectionId,
+      [Query.equal("userLiked", [userId]), Query.orderDesc('$createdAt')]
+    );
+
+    console.log(post.documents.length, '<- saved')
+    return post.documents as IPost[];
+  } catch (error) {
+    console.log()
+    throw new Error;
+  }
+}
