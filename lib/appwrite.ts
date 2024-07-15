@@ -134,7 +134,6 @@ export const createUser: ICreateUser = async (email, password, username) => {
 export const signIn: ISignIn = async (email, password) => {
   try {
     const session = await account.createEmailPasswordSession(email, password);
-    console.log("SESSION => ", session);
     return session;
   } catch (error: any) {
     console.log("error sign in => ", error);
@@ -313,8 +312,6 @@ export const likedVideo = async (videoId: string, userLiked: string[]) => {
         userLiked
       }
     )
-
-    console.log(updatedSaved, '<- updatedSaved')
   } catch (error) {
     console.log('error liked video => ', error)
     throw new Error;
@@ -329,10 +326,9 @@ export const getVideosBySaved = async (userId: string): Promise<IPost[]> => {
       [Query.equal("userLiked", [userId]), Query.orderDesc('$createdAt')]
     );
 
-    console.log(post.documents.length, '<- saved')
     return post.documents as IPost[];
   } catch (error) {
-    console.log()
+    console.log('error get video by saved => ', error)
     throw new Error;
   }
 }

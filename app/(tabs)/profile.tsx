@@ -76,7 +76,7 @@ const RenderHeader = ({ avatar, username, totalPosts, totalLike, logOut }: Rende
     </View>
     <View className="flex-row justify-center mt-3">
       <InfoBox title={totalPosts} subtitle="Posts" containerStyles="mr-10" textStyles="text-lg" />
-      <InfoBox title={totalLike} subtitle="Like" textStyles="text-lg"/>
+      <InfoBox title={totalLike} subtitle="Likes" textStyles="text-lg"/>
     </View>
   </View>
 );
@@ -110,7 +110,6 @@ const Profile = () => {
     setRefreshing(false)
   }
 
-  console.log(user, '<- user')
   return (
     <SafeAreaView className="bg-primary h-full">
       <FlatList

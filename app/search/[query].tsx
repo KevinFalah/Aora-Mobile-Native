@@ -75,11 +75,9 @@ const Search = () => {
     isLoading,
     refetch,
   } = useAppwrite<IPost>(() => searchPosts(_query));
-  console.log(isLoading, "<- loa");
   useEffect(() => {
     refetch();
   }, [query]);
-  console.log(postsData, query, "<- postsData");
   return (
     <SafeAreaView className="bg-primary h-full">
       <FlatList

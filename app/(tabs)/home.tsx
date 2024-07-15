@@ -95,7 +95,6 @@ const Home = () => {
     await refetch();
     setRefreshing(false);
   };
-  // console.log(postsData, '<- po')
   return (
     <SafeAreaView className="bg-primary h-full">
       <FlatList

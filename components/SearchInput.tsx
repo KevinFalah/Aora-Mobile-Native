@@ -36,7 +36,6 @@ const SearchInput = ({
         "Please input something to search result accross database"
       );
     }
-    console.log(pathname.startsWith("/search"), "<- ");
     if (pathname.startsWith("/search")) router.setParams({ query });
     else router.push(`/search/${query}`);
   };

@@ -62,7 +62,6 @@ const VideoCard = ({ videoData, refetch }: VideoCardType) => {
         userLikedSet.add(userId);
         const updatedUserLiked = Array.from(userLikedSet);
 
-        console.log(updatedUserLiked, "< updated liked");
         await likedVideo($id, updatedUserLiked);
 
         if (typeof refetch === "function") {
