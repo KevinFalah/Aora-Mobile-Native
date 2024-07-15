@@ -45,16 +45,18 @@ interface IPost {
   thumbnail: string;
   title: string;
   video: string;
+  userLiked: string[];
 }
 
 type RenderHeaderTypes = {
   avatar: string;
   username: string;
   totalPosts: number;
+  totalLike: number;
   logOut: () => void;
 };
 
-const RenderHeader = ({ avatar, username, totalPosts, logOut }: RenderHeaderTypes) => (
+const RenderHeader = ({ avatar, username, totalPosts, totalLike, logOut }: RenderHeaderTypes) => (
   <View className="px-3 pb-10">
     <View className="mb-4 mt-14 flex-row items-center justify-end space-y-6">
       <TouchableOpacity activeOpacity={0.6} onPress={logOut}>
@@ -74,7 +76,7 @@ const RenderHeader = ({ avatar, username, totalPosts, logOut }: RenderHeaderType
     </View>
     <View className="flex-row justify-center mt-3">
       <InfoBox title={totalPosts} subtitle="Posts" containerStyles="mr-10" textStyles="text-lg" />
-      <InfoBox title="1.3k" subtitle="Views" textStyles="text-lg"/>
+      <InfoBox title={totalLike} subtitle="Like" textStyles="text-lg"/>
     </View>
   </View>
 );
@@ -88,6 +90,11 @@ const Profile = () => {
     isLoading,
     refetch,
   } = useAppwrite<IPost>(() => getUserPosts(userId));
+
+  const totalLikedVideo = () => {
+    const result = postsData.reduce((total, curr) => total += curr.userLiked.length, 0)
+    return result;
+  }
 
   const logOut = async() => {
     await signOut()
@@ -115,6 +122,7 @@ const Profile = () => {
             avatar={user?.avatar || ""}
             username={user?.username || ""}
             totalPosts={postsData?.length || 0}
+            totalLike={totalLikedVideo()}
             logOut={logOut}
           />
         )}
