@@ -194,7 +194,7 @@ export const getLatestPosts = async (): Promise<IPost[]> => {
     return post.documents as IPost[];
   } catch (error) {
     console.log("error latest posts => ", error);
-    throw new Error();
+    throw new Error;
   }
 };
 
@@ -209,7 +209,7 @@ export const searchPosts = async (query: string): Promise<IPost[]> => {
     return post.documents as IPost[];
   } catch (error) {
     console.log("error search posts => ", error);
-    throw new Error();
+    throw new Error;
   }
 };
 
@@ -251,7 +251,7 @@ const getFilePreview = async (fileId: string, type: string) => {
     return fileUrl;
   } catch (error) {
     console.log("error get file preview => ", error);
-    throw new Error();
+    throw new Error;
   }
 };
 
@@ -272,7 +272,7 @@ const uploadFile = async (file: IDocumentPickerAssets | null, type: string) => {
     return fileUrl;
   } catch (error) {
     console.log("error upload file => ", error);
-    throw new Error();
+    throw new Error;
   }
 };
 
@@ -299,7 +299,7 @@ export const createVideo = async (form: ICreateVideoForm) => {
     return newPost;
   } catch (error) {
     console.log("error create video => ", error);
-    throw new Error();
+    throw new Error;
   }
 };
 
