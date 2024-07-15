@@ -172,7 +172,8 @@ export const getAllPosts = async (): Promise<IPost[]> => {
   try {
     const post = await databases.listDocuments(
       appwriteconfig.databaseId,
-      appwriteconfig.videoCollectionId
+      appwriteconfig.videoCollectionId,
+      [Query.orderDesc('$createdAt')]
     );
 
     return post.documents as IPost[];
@@ -187,7 +188,7 @@ export const getLatestPosts = async (): Promise<IPost[]> => {
     const post = await databases.listDocuments(
       appwriteconfig.databaseId,
       appwriteconfig.videoCollectionId,
-      [Query.orderDesc("$createdAt"), Query.limit(7)]
+      [Query.orderAsc("$createdAt"), Query.limit(7)]
     );
 
     return post.documents as IPost[];
