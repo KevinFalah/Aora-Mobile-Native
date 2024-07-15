@@ -1,4 +1,4 @@
-import { View, Text, Image, TouchableOpacity, Alert } from "react-native";
+import { View, Text, Image, TouchableOpacity, Alert, ActivityIndicator } from "react-native";
 import React, { useCallback, useState } from "react";
 import { icons } from "@/constants";
 import { Video, ResizeMode } from "expo-av";
@@ -156,8 +156,8 @@ const VideoCard = ({ videoData, refetch }: VideoCardType) => {
               className="bg-black-100 w-36 rounded-md absolute right-1 top-12 px-3 py-2"
               disabled={isLoading}
             >
-              <Text className="text-white text-left font-pregular">
-                {isAlreadySaved().title}
+              <Text className={`text-white font-pregular ${isLoading ? 'text-center' : 'text-left'}`}>
+               {isLoading ? (<ActivityIndicator />) : isAlreadySaved().title}
               </Text>
             </TouchableOpacity>
           ) : null}
