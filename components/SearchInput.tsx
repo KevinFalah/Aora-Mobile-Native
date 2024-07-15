@@ -11,7 +11,7 @@ import { icons } from "@/constants";
 import { router, usePathname } from "expo-router";
 
 type SearchInputTypes = {
-  initialQuery: string | number
+  initialQuery?: string | number
 };
 
 const SearchInput = ({ initialQuery }: SearchInputTypes) => {

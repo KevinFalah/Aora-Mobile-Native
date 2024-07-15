@@ -44,6 +44,7 @@ interface IPost {
   thumbnail: string;
   title: string;
   video: string;
+  userLiked: string[]
 }
 
 type RenderHeaderTypes = {
@@ -64,8 +65,7 @@ const RenderHeader = ({ latestData }: RenderHeaderTypes) => (
       />
     </View>
 
-    <SearchInput
-    />
+    <SearchInput />
 
     <View className="w-full flex-1 pt-5 pb-8">
       <Text className="text-gray-400 text-sm font-pregular">
@@ -95,13 +95,13 @@ const Home = () => {
     await refetch();
     setRefreshing(false);
   };
-
+  // console.log(postsData, '<- po')
   return (
     <SafeAreaView className="bg-primary h-full">
       <FlatList
         data={postsData || []}
         renderItem={({ item }) => (
-          <VideoCard videoData={item} />
+          <VideoCard videoData={item} refetch={refetch} />
         )}
         keyExtractor={(item) => item?.$id}
         ListHeaderComponent={() => <RenderHeader latestData={latestData} />}

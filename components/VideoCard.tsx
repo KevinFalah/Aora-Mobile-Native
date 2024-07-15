@@ -1,7 +1,9 @@
-import { View, Text, Image, TouchableOpacity } from "react-native";
-import React, { useState } from "react";
+import { View, Text, Image, TouchableOpacity, Alert } from "react-native";
+import React, { useCallback, useState } from "react";
 import { icons } from "@/constants";
 import { Video, ResizeMode } from "expo-av";
+import { likedVideo } from "@/lib/appwrite";
+import { useGlobalContext } from "@/context/GlobalProvider";
 
 interface ICreator {
   $collectionId: string;
@@ -30,21 +32,77 @@ interface IPost {
   thumbnail: string;
   title: string;
   video: string;
+  userLiked: string[];
 }
 
 type VideoCardType = {
   videoData: IPost;
+  refetch: () => void;
 };
 
-const VideoCard = ({ videoData }: VideoCardType) => {
+const VideoCard = ({ videoData, refetch }: VideoCardType) => {
   const {
     title,
     video,
     thumbnail,
     prompt,
+    $id,
+    userLiked,
     creator: { avatar, username },
   } = videoData;
+  const { user } = useGlobalContext();
 
+  const savedVideo = async () => {
+    const userId = user?.$id || "";
+
+    try {
+      if (userId) {
+        const userLikedSet = new Set(userLiked);
+        userLikedSet.add(userId);
+        const updatedUserLiked = Array.from(userLikedSet);
+
+        console.log(updatedUserLiked, "< updated liked");
+        await likedVideo($id, updatedUserLiked);
+        await refetch();
+      }
+    } catch (error) {
+      Alert.alert("Error", "Error Save Video");
+    }
+  };
+
+  const unSavedVideo = async () => {
+    const userId = user?.$id || "";
+
+    try {
+      if (userId) {
+        const updatedUserLiked = userLiked?.filter((id) => id !== user?.$id);
+
+        console.log(updatedUserLiked, "< updated UnLiked");
+        await likedVideo($id, updatedUserLiked);
+        await refetch();
+      }
+    } catch (error) {
+      Alert.alert("Error", "Error Save Video");
+    }
+  };
+
+  const isAlreadySaved = useCallback(() => {
+    const isSaved = userLiked.some((id) => id === user?.$id);
+
+    if (isSaved) {
+      return {
+        title: "Unsaved",
+        func: unSavedVideo,
+      };
+    }
+
+    return {
+      title: "Save",
+      func: savedVideo,
+    };
+  }, [userLiked]);
+
+  const [isOpenComp, setIsOpenComp] = useState(false);
   const [play, setPlay] = useState(false);
 
   return (
@@ -75,8 +133,23 @@ const VideoCard = ({ videoData }: VideoCardType) => {
           </View>
         </View>
 
-        <TouchableOpacity className="pt-2" activeOpacity={0.6}>
+        <TouchableOpacity
+          className="pt-2 relative z-[90]"
+          activeOpacity={0.6}
+          onPress={() => setIsOpenComp(!isOpenComp)}
+        >
           <Image source={icons.menu} className="w-5 h-5" resizeMode="contain" />
+          {isOpenComp ? (
+            <TouchableOpacity
+              activeOpacity={0.6}
+              onPress={isAlreadySaved().func}
+              className="bg-black-100 w-36 rounded-md absolute right-1 top-12 px-3 py-2"
+            >
+              <Text className="text-white text-left font-pregular">
+                {isAlreadySaved().title}
+              </Text>
+            </TouchableOpacity>
+          ) : null}
         </TouchableOpacity>
       </View>
 
@@ -89,7 +162,7 @@ const VideoCard = ({ videoData }: VideoCardType) => {
           className="w-full h-60 rounded-lg bg-white/10"
           onPlaybackStatusUpdate={(status) => {
             if (status?.didJustFinish) {
-              setPlay(false)
+              setPlay(false);
             }
           }}
         />

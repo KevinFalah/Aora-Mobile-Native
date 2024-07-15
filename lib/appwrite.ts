@@ -58,6 +58,7 @@ interface IPost {
   thumbnail: string;
   title: string;
   video: string;
+  userLiked: string[];
 }
 
 interface IDocumentPickerAssets {
@@ -301,3 +302,21 @@ export const createVideo = async (form: ICreateVideoForm) => {
     throw new Error();
   }
 };
+
+export const likedVideo = async (videoId: string, userLiked: string[]) => {
+  try {
+    const updatedSaved = await databases.updateDocument(
+      appwriteconfig.databaseId,
+      appwriteconfig.videoCollectionId,
+      videoId,
+      {
+        userLiked
+      }
+    )
+
+    console.log(updatedSaved, '<- updatedSaved')
+  } catch (error) {
+    console.log('error liked video => ', error)
+    throw new Error;
+  }
+}
