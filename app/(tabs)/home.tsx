@@ -16,6 +16,7 @@ import { getAllPosts, getLatestPosts } from "@/lib/appwrite";
 import useAppwrite from "@/lib/useAppwrite";
 import VideoCard from "@/components/VideoCard";
 import { StatusBar } from "expo-status-bar";
+import { useGlobalContext } from "@/context/GlobalProvider";
 
 interface ICreator {
   $collectionId: string;
@@ -48,15 +49,16 @@ interface IPost {
 }
 
 type RenderHeaderTypes = {
-  latestData: IPost[],
+  latestData: IPost[];
+  username: string;
 }
 
-const RenderHeader = ({ latestData }: RenderHeaderTypes) => (
+const RenderHeader = ({ latestData, username }: RenderHeaderTypes) => (
   <View className="px-3">
     <View className="my-10 flex-row items-center justify-between space-y-6">
       <View>
         <Text className="text-sm font-pmedium text-white">Welcome Back</Text>
-        <Text className="text-2xl font-psemibold text-white">Kevin Falah</Text>
+        <Text className="text-2xl font-psemibold text-white">{username}</Text>
       </View>
       <Image
         source={images.logoSmall}
@@ -87,6 +89,7 @@ const Home = () => {
     data: latestData,
     isLoading: isLoadingLatest,
   } = useAppwrite<IPost>(getLatestPosts);
+  const {user} = useGlobalContext()
 
   const [refreshing, setRefreshing] = useState(false);
 
@@ -103,7 +106,7 @@ const Home = () => {
           <VideoCard videoData={item} refetch={refetch} />
         )}
         keyExtractor={(item) => item?.$id}
-        ListHeaderComponent={() => <RenderHeader latestData={latestData} />}
+        ListHeaderComponent={() => <RenderHeader latestData={latestData} username={user?.username ?? ''} />}
         ListEmptyComponent={() => (
           <EmptyState
             title="No Videos Found"
