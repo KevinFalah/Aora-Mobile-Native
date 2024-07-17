@@ -1,9 +1,17 @@
-import { View, Text, Image, TouchableOpacity, Alert, ActivityIndicator } from "react-native";
+import {
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+  Alert,
+  ActivityIndicator,
+} from "react-native";
 import React, { useCallback, useState } from "react";
 import { icons } from "@/constants";
 import { Video, ResizeMode } from "expo-av";
 import { likedVideo } from "@/lib/appwrite";
 import { useGlobalContext } from "@/context/GlobalProvider";
+import { router } from "expo-router";
 
 interface ICreator {
   $collectionId: string;
@@ -48,7 +56,7 @@ const VideoCard = ({ videoData, refetch }: VideoCardType) => {
     prompt,
     $id,
     userLiked,
-    creator: { avatar, username },
+    creator: { avatar, username, $id: creatorId },
   } = videoData;
   const { user } = useGlobalContext();
   const [isLoading, setIsLoading] = useState(false);
@@ -118,13 +126,22 @@ const VideoCard = ({ videoData, refetch }: VideoCardType) => {
     <View className="flex-col items-center px-4 mb-14">
       <View className="flex-row gap-3 items-start">
         <View className="justify-center items-center flex-row flex-1">
-          <View className="w-[46px] h-[46px] rounded-lg border border-secondary justify-center items-center p-0.5">
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={() =>
+              router.push({
+                pathname: "/search/user-profile",
+                params: { id: creatorId, avatar, username },
+              })
+            }
+            className="w-[46px] h-[46px] rounded-lg border border-secondary justify-center items-center p-0.5"
+          >
             <Image
               source={{ uri: avatar }}
               className="rounded-lg w-full h-full"
               resizeMode="contain"
             />
-          </View>
+          </TouchableOpacity>
 
           <View className="justify-center flex-1 ml-3 gap-y-1">
             <Text
@@ -155,8 +172,12 @@ const VideoCard = ({ videoData, refetch }: VideoCardType) => {
               className="bg-black-100 w-36 rounded-md absolute right-1 top-12 px-3 py-2"
               disabled={isLoading}
             >
-              <Text className={`text-white font-pregular ${isLoading ? 'text-center' : 'text-left'}`}>
-               {isLoading ? (<ActivityIndicator />) : isAlreadySaved().title}
+              <Text
+                className={`text-white font-pregular ${
+                  isLoading ? "text-center" : "text-left"
+                }`}
+              >
+                {isLoading ? <ActivityIndicator /> : isAlreadySaved().title}
               </Text>
             </TouchableOpacity>
           ) : null}
