@@ -268,7 +268,7 @@ const uploadFile = async (file: IDocumentPickerAssets | null, type: string) => {
       asset
     );
 
-    const fileUrl = await getFilePreview(uploadedFile.$id, "video");
+    const fileUrl = await getFilePreview(uploadedFile.$id, type);
     return fileUrl;
   } catch (error) {
     console.log("error upload file => ", error);
